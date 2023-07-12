@@ -4,17 +4,17 @@ import (
 	"github.com/Trendyol/go-dcp-elasticsearch"
 	"github.com/Trendyol/go-dcp-elasticsearch/config"
 	"github.com/Trendyol/go-dcp-elasticsearch/couchbase"
-	"github.com/Trendyol/go-dcp-elasticsearch/elasticsearch/document"
+	"github.com/Trendyol/go-dcp-elasticsearch/elasticsearch"
 	dcpConfig "github.com/Trendyol/go-dcp/config"
 )
 
-func mapper(event couchbase.Event) []document.ESActionDocument {
+func mapper(event couchbase.Event) []elasticsearch.ActionDocument {
 	if event.IsMutated {
-		e := document.NewIndexAction(event.Key, event.Value, nil)
-		return []document.ESActionDocument{e}
+		e := elasticsearch.NewIndexAction(event.Key, event.Value, nil)
+		return []elasticsearch.ActionDocument{e}
 	}
-	e := document.NewDeleteAction(event.Key, nil)
-	return []document.ESActionDocument{e}
+	e := elasticsearch.NewDeleteAction(event.Key, nil)
+	return []elasticsearch.ActionDocument{e}
 }
 
 func main() {

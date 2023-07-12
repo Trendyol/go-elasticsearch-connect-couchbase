@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 
+	"github.com/Trendyol/go-dcp-elasticsearch/elasticsearch/client"
 	"github.com/Trendyol/go-dcp/logger"
 
 	"github.com/Trendyol/go-dcp-elasticsearch/config"
@@ -27,7 +28,7 @@ type connector struct {
 	config      *config.Config
 	logger      logger.Logger
 	errorLogger logger.Logger
-	bulk        *bulk.Bulk
+	bulk        *bulk.Processor
 }
 
 func (c *connector) Start() {
@@ -116,11 +117,18 @@ func newConnector(cf any, mapper Mapper, logger logger.Logger, errorLogger logge
 	dcpConfig.Checkpoint.Type = "manual"
 
 	connector.dcp = dcp
-	connector.bulk, err = bulk.NewBulk(
+
+	esClient, err := client.New(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	connector.bulk, err = bulk.NewProcessor(
 		cfg,
 		logger,
 		errorLogger,
 		dcp.Commit,
+		esClient,
 	)
 	if err != nil {
 		return nil, err
